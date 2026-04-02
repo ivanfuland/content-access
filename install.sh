@@ -15,6 +15,7 @@ rsync -a --delete \
   --exclude='install.sh' \
   --exclude='.git/' \
   --exclude='.gitignore' \
+  --exclude='docs/' \
   "$SCRIPT_DIR/" "$DEST/"
 
 # Claude Code 软链（仅 OpenClaw 用户需要）
