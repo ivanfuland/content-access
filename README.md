@@ -47,24 +47,26 @@ pip install playwright
 playwright install chromium
 ```
 
-### 2. 克隆 skill
+### 2. 克隆并安装 skill
 
-**OpenClaw 用户：**
 ```bash
-git clone https://github.com/ivanfuland/content-access.git \
-  ~/.openclaw/skills/content-access
+git clone https://github.com/ivanfuland/content-access.git
+cd content-access
+./install.sh
 ```
+
+`install.sh` 会自动：
+- 将 skill 文件同步到 `~/.openclaw/skills/content-access`（排除 README、.git 等非 runtime 文件）
+- 检测到 OpenClaw 时自动创建 Claude Code 软链 `~/.claude/skills/content-access`
 
 **Claude Code only 用户（无 OpenClaw）：**
 ```bash
-git clone https://github.com/ivanfuland/content-access.git \
-  ~/.claude/skills/content-access
+./install.sh ~/.claude/skills/content-access
 ```
 
-### 3. Claude Code 注册（OpenClaw 用户额外执行）
-
+后续更新：
 ```bash
-ln -s ~/.openclaw/skills/content-access ~/.claude/skills/content-access
+git pull && ./install.sh
 ```
 
 ### 4. 设置 Browser Use API Key
