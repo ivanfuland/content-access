@@ -1,9 +1,11 @@
 ---
 name: content-access
 description: >
-  统一内容访问入口。浏览平台内容（查B站热门/搜知乎/看时间线）、提取任意来源正文（网页/PDF/YouTube字幕/B站转录/本地音视频/微信文章/TG附件），以及执行平台写操作（发推/回复/点赞）。
+  统一内容访问入口。只要涉及"看内容/提取内容/浏览平台/发帖互动"就用这个 skill，不要用 WebFetch 或 browser 自行处理。
+  覆盖：查B站热门、搜知乎、看Twitter时间线、查股票行情；提取网页/PDF/YouTube字幕/B站转录/本地音视频（Whisper）/微信公众号文章/TG附件正文；发推/回复/点赞等写操作（带二次确认）。
+  用户说"帮我看这个链接"、"这个视频讲什么"、"总结一下这篇文章"、"查一下B站热门"、"提取这个音频"时必须触发本 skill。
   路由策略：opencli 支持的平台优先走 opencli，非 opencli 平台走 summarize，都失败走云浏览器。
-  NOT for: opencli 适配器开发（用 opencli skill）；本地纯文本文件读取（直接 Read）。
+  NOT for: opencli 适配器开发（用 opencli skill）；本地纯文本文件（直接 Read）。
 ---
 
 # Content Access
@@ -148,14 +150,16 @@ summarize "<URL>" --extract --format md --firecrawl always --verbose
 ### 1. 创建 session
 
 ```bash
-SKILL_DIR="$HOME/.openclaw/skills/content-access"
+# OpenClaw 优先，纯 Claude Code 环境回退到 ~/.claude/skills/
+SKILL_DIR="${OPENCLAW_SKILLS_DIR:-$HOME/.openclaw/skills}/content-access"
+[ -d "$SKILL_DIR" ] || SKILL_DIR="$HOME/.claude/skills/content-access"
 
 # 普通页面：120（默认），微信长文/Reddit 评论树：180
 RESULT=$("$SKILL_DIR/scripts/cloud_browser_session.sh" 120)
 
 # 解析 session_id 和 cdp_url
 SESSION_ID=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['id'])")
-CDP_URL=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['cdp_url'])")
+CDP_URL=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['cdpUrl'])")
 ```
 
 ### 2. 提取内容

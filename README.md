@@ -7,7 +7,7 @@
 ## 能做什么
 
 - **浏览平台内容**：查 B 站热门、搜知乎、看 Twitter 时间线、查股票行情……
-- **提取任意来源正文**：网页、PDF、YouTube 字幕、B 站转录、本地音视频（Whisper）、微信公众号文章、TG 附件
+- **提取任意来源正文**：网页、PDF、YouTube 字幕、B 站转录、本地音视频（Whisper 转录）、微信公众号文章、TG 附件
 - **平台写操作**：发推、回复、点赞、删推（带二次确认）
 
 ## 路由策略
@@ -23,39 +23,92 @@
   └─ 写操作                        → 二次确认 → opencli
 ```
 
-决策完全由 AI agent 基于 SKILL.md 执行，无 Python 路由脚本。
+## 前置依赖
 
-## 依赖
-
-| 工具 | 说明 |
-|------|------|
-| [opencli](https://github.com/ivanfuland/opencli) | 平台内容 CLI，16 个站点 55+ 命令 |
-| [@steipete/summarize](https://github.com/steipete/summarize) | 网页/PDF/音视频提取，`npm i -g @steipete/summarize` |
-| [playwright](https://playwright.dev/) | 云浏览器 CDP 连接，`pip install playwright` |
-| [Browser Use](https://browser-use.com/) | 云端浏览器服务，需 API Key |
+| 工具 | 安装方式 | 用途 |
+|------|---------|------|
+| [opencli](https://github.com/ivanfuland/openclaw) | 见 opencli 文档 | 平台内容 CLI（16 个站点）|
+| Node.js 18+ | [nodejs.org](https://nodejs.org) | 运行 summarize |
+| [@steipete/summarize](https://github.com/steipete/summarize) | `npm install -g @steipete/summarize` | 网页/PDF/音视频提取 |
+| Python 3.9+ | 系统自带或 [python.org](https://python.org) | 运行 cloud browser 脚本 |
+| playwright | `pip install playwright` + `playwright install chromium` | 云浏览器 CDP 连接 |
+| [Browser Use](https://browser-use.com/) 账号 | 注册后获取 API Key | 云端浏览器服务 |
 
 ## 安装
 
+### 1. 安装依赖
+
 ```bash
-# 1. 克隆到本地
-git clone https://github.com/ivanfuland/content-access.git ~/.openclaw/skills/content-access
+# summarize
+npm install -g @steipete/summarize
 
-# 或软链已有目录
-ln -s /path/to/content-access ~/.openclaw/skills/content-access
-
-# 2. Claude Code 注册
-ln -s ~/.openclaw/skills/content-access ~/.claude/skills/content-access
-
-# 3. 设置 Browser Use API Key
-export BROWSER_USE_API_KEY="your_key_here"
-# 或写入 ~/.bashrc / openclaw.json env 字段
+# playwright
+pip install playwright
+playwright install chromium
 ```
 
-## 环境变量
+### 2. 克隆 skill
 
-| 变量 | 说明 |
-|------|------|
-| `BROWSER_USE_API_KEY` | Browser Use 云浏览器 API Key，必须设置 |
+**OpenClaw 用户：**
+```bash
+git clone https://github.com/ivanfuland/content-access.git \
+  ~/.openclaw/skills/content-access
+```
+
+**Claude Code only 用户（无 OpenClaw）：**
+```bash
+git clone https://github.com/ivanfuland/content-access.git \
+  ~/.claude/skills/content-access
+```
+
+### 3. Claude Code 注册（OpenClaw 用户额外执行）
+
+```bash
+ln -s ~/.openclaw/skills/content-access ~/.claude/skills/content-access
+```
+
+### 4. 设置 Browser Use API Key
+
+```bash
+# 持久化写入 ~/.bashrc（或 ~/.zshrc）
+echo 'export BROWSER_USE_API_KEY="your_key_here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+OpenClaw 用户也可写入 `openclaw.json` 的 `env` 字段，OpenClaw 会自动注入：
+
+```json
+{
+  "env": {
+    "BROWSER_USE_API_KEY": "your_key_here"
+  }
+}
+```
+
+### 5. 验证安装
+
+```bash
+# 确认 skill 可访问
+ls ~/.claude/skills/content-access/SKILL.md
+
+# 确认 summarize 可用
+summarize --version
+
+# 确认环境变量已设置
+echo $BROWSER_USE_API_KEY
+```
+
+## 使用
+
+直接在 Claude Code 对话中描述意图，skill 自动触发，无需显式调用：
+
+```
+查一下 B 站热门
+提取这个 YouTube 视频的字幕：https://youtube.com/watch?v=xxx
+提取这篇微信文章：https://mp.weixin.qq.com/s/xxx
+帮我看一下这个网页：https://blog.example.com/xxx
+发一条推文："hello world"
+```
 
 ## 文件结构
 
@@ -72,18 +125,6 @@ content-access/
     └── cloud_browser_stop.sh       # 停止 session（必须执行，释放资源）
 ```
 
-## 使用示例
-
-直接在对话中描述意图，skill 自动触发：
-
-```
-查一下 B 站热门
-提取这个 YouTube 视频的字幕：https://youtube.com/watch?v=xxx
-提取这篇微信文章：https://mp.weixin.qq.com/s/xxx
-帮我看一下这个网页：https://blog.example.com/xxx
-发一条推文："hello world"
-```
-
 ## 支持平台
 
 opencli 覆盖：Bilibili、YouTube、Twitter/X、知乎、微博、小红书、Reddit、HackerNews、V2EX、雪球、BOSS直聘、BBC、路透社、携程、什么值得买、Yahoo Finance
@@ -92,6 +133,6 @@ cloud browser 兜底：微信公众号、反爬站点、任意需要真实浏览
 
 ## 不支持
 
-- 抖音、腾讯视频、爱奇艺、优酷、西瓜视频、TikTok 的视频提取（建议下载后以本地文件提交）
+- 抖音、腾讯视频、爱奇艺、优酷、西瓜视频、TikTok 的视频提取（建议下载到本地后以文件路径提交）
 - opencli 适配器开发（用 opencli skill）
-- 本地纯文本文件（直接 Read）
+- 本地纯文本文件读取（直接 Read 即可）
