@@ -27,8 +27,9 @@
 
 | 工具 | 安装方式 | 用途 |
 |------|---------|------|
-| [opencli](https://github.com/ivanfuland/openclaw) | 见 opencli 文档 | 平台内容 CLI（16 个站点）|
-| Node.js 18+ | [nodejs.org](https://nodejs.org) | 运行 summarize |
+| Node.js 18+ | [nodejs.org](https://nodejs.org) | 运行 opencli 和 summarize |
+| [opencli](https://github.com/jackwener/opencli) | `npm install -g @jackwener/opencli` | 平台内容 CLI（16 个站点）|
+| [opencli-plugin-transcribe](https://github.com/ivanfuland/opencli-plugin-transcribe) | `opencli plugin install github:ivanfuland/opencli-plugin-transcribe` | YouTube/Bilibili 字幕提取（含 Whisper 回退）|
 | [@steipete/summarize](https://github.com/steipete/summarize) | `npm install -g @steipete/summarize` | 网页/PDF/音视频提取 |
 | Python 3.9+ | 系统自带或 [python.org](https://python.org) | 运行 cloud browser 脚本 |
 | playwright | `pip install playwright` + `playwright install chromium` | 云浏览器 CDP 连接 |
@@ -39,6 +40,12 @@
 ### 1. 安装依赖
 
 ```bash
+# opencli
+npm install -g @jackwener/opencli
+
+# transcribe 插件（YouTube/Bilibili 字幕）
+opencli plugin install github:ivanfuland/opencli-plugin-transcribe
+
 # summarize
 npm install -g @steipete/summarize
 
