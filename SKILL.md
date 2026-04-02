@@ -2,9 +2,9 @@
 name: content-access
 description: >
   统一内容访问入口。只要涉及"看内容/提取内容/浏览平台/发帖互动"就用这个 skill，不要用 WebFetch 或 browser 自行处理。
-  覆盖：查B站热门、搜知乎、看Twitter时间线、查股票行情；提取网页/PDF/YouTube字幕/B站转录/本地音视频（Whisper）/微信公众号文章/TG附件正文；发推/回复/点赞等写操作（带二次确认）。
+  覆盖：查B站/YouTube/Twitter/Reddit/知乎/小红书/微博/LinkedIn/Instagram/TikTok/豆瓣/即刻/Bloomberg/36kr/HackerNews/Wikipedia/雪球/Yahoo Finance/BOSS等64个平台；提取网页/PDF/YouTube字幕（插件）/B站转录（插件）/本地音视频（Whisper）/微信公众号文章/TG附件正文；发推/回复/点赞等写操作（带二次确认）。
   用户说"帮我看这个链接"、"这个视频讲什么"、"总结一下这篇文章"、"查一下B站热门"、"提取这个音频"时必须触发本 skill。
-  路由策略：opencli 支持的平台优先走 opencli，非 opencli 平台走 summarize，都失败走云浏览器。
+  路由策略：opencli 支持的平台优先走 opencli（YouTube/Bilibili转录由plugin处理），非 opencli 平台走 summarize，都失败走云浏览器。
   NOT for: opencli 适配器开发（用 opencli skill）；本地纯文本文件（直接 Read）。
 ---
 
@@ -121,15 +121,14 @@ opencli twitter thread <tweet-id>   # 从 tweet URL 末段提取 id
 # 网页/文章/PDF（默认超时 2 分钟）
 summarize "<URL或文件路径>" --extract --format md --verbose
 
-# YouTube 视频（需要字幕/转录，最长 30 分钟）
-summarize "<youtube_watch_url>" --extract --format md --youtube auto --verbose --timeout 30m
-
 # 本地音视频（Whisper 转录）
 summarize "<本地文件路径>" --extract --format md --transcriber whisper --verbose --timeout 30m
 
 # 强制云端提取（普通抓取失败时）
 summarize "<URL>" --extract --format md --firecrawl always --verbose
 ```
+
+**注意：YouTube/Bilibili URL 不走 summarize**，由 opencli-plugin-transcribe 处理（见决策流程）。只有在 opencli 非内容不可用类错误时才降级 summarize，此时使用通用形式（无 `--youtube` 参数）。
 
 **--verbose 必须始终带上，防止长任务因无输出被判为卡死。**
 
