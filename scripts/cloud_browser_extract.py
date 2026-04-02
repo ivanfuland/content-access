@@ -38,10 +38,18 @@ def extract(cdp_url: str, target_url: str, wechat: bool = False) -> dict:
                 'url': target_url,
             }
         else:
-            body_el = page.query_selector('body')
+            # 优先用语义化选择器提取正文，避免导航栏/广告/页脚噪音
+            content_el = (
+                page.query_selector('article')
+                or page.query_selector('main')
+                or page.query_selector('[role="main"]')
+                or page.query_selector('.post-content')
+                or page.query_selector('.entry-content')
+                or page.query_selector('body')
+            )
             result = {
                 'title': page.title(),
-                'content': body_el.inner_text().strip() if body_el else '',
+                'content': content_el.inner_text().strip() if content_el else '',
                 'url': target_url,
             }
 

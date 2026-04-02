@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Create a Browser Use cloud browser session.
+# Create a Browser Use cloud_browser session.
 # Returns JSON with session_id and cdp_url.
 #
 # Usage: cloud_browser_session.sh [TIMEOUT_SECONDS]

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Stop a Browser Use cloud browser session.
+# Stop a Browser Use cloud_browser session.
 # Usage: cloud_browser_stop.sh <session-id>
 
 if [[ $# -ne 1 ]]; then
