@@ -2,6 +2,21 @@
 
 opencli 基准版本：**1.5.7**
 
+## 速查
+
+**URL 提取支持 opencli 的平台：**
+YouTube → `youtube transcribe <url>` ｜ Bilibili → `bilibili transcribe <url>` ｜ Twitter/X → `twitter thread <tweet-id>` ⚠️待验证 ｜ V2EX → `v2ex topic --id <id>`
+
+**已知不支持视频提取的平台（报错）：**
+douyin.com · v.qq.com · iqiyi.com · youku.com · xigua.com · tiktok.com · weibo.com(视频帖)
+
+**直接走 cloud browser 的平台：**
+mp.weixin.qq.com
+
+## 平台目录
+
+[BBC](#bbc) · [Bilibili](#bilibilib站) · [BOSS直聘](#boss直聘) · [携程](#携程ctrip) · [HackerNews](#hackernews) · [Reddit](#reddit) · [路透社](#路透社reuters) · [什么值得买](#什么值得买smzdm) · [Twitter/X](#twitter--x) · [V2EX](#v2ex) · [微博](#微博weibo) · [小红书](#小红书xiaohongshu) · [雪球](#雪球xueqiu) · [Yahoo Finance](#yahoo-finance) · [YouTube](#youtube) · [知乎](#知乎zhihu)
+
 ## 说明
 
 - **URL 提取默认命令**：用户给出平台 URL 要获取内容时，优先执行的 opencli 命令
@@ -206,7 +221,9 @@ URL 提取默认命令：无（Yahoo Finance 页面 → summarize --extract）
 
 **URL 提取默认命令**：`youtube transcribe <url_or_video_id>`（字幕优先，Whisper large-v3 兜底）
 URL 标准化：先转换为 `youtube.com/watch?v=<id>` 格式再传入
-Fallback：`transcriptSource=unavailable` → summarize 无法进一步处理，报错建议用户手动下载
+Fallback：
+- `transcriptSource=unavailable` → 字幕和音频均不可用，**直接报错**，不降级 summarize
+- 其他 opencli 失败（网络超时、命令不存在）→ 降级 `summarize --extract --youtube auto`
 
 ---
 

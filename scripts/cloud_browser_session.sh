@@ -18,7 +18,17 @@ if [[ -z "${API_KEY}" ]]; then
   exit 1
 fi
 
-curl -sS -X POST 'https://api.browser-use.com/api/v2/browsers' \
+RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST 'https://api.browser-use.com/api/v2/browsers' \
   -H "X-Browser-Use-API-Key: ${API_KEY}" \
   -H 'Content-Type: application/json' \
-  -d "{\"timeout\":${TIMEOUT}}"
+  -d "{\"timeout\":${TIMEOUT}}")
+
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+BODY=$(echo "$RESPONSE" | head -n -1)
+
+if [[ "$HTTP_CODE" != "200" && "$HTTP_CODE" != "201" ]]; then
+  echo "Error: Browser Use API returned HTTP $HTTP_CODE: $BODY" >&2
+  exit 1
+fi
+
+echo "$BODY"

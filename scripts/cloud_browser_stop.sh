@@ -17,7 +17,17 @@ if [[ -z "${API_KEY}" ]]; then
   exit 1
 fi
 
-curl -sS -X PATCH "https://api.browser-use.com/api/v2/browsers/${SESSION_ID}" \
+RESPONSE=$(curl -sS -w "\n%{http_code}" -X PATCH "https://api.browser-use.com/api/v2/browsers/${SESSION_ID}" \
   -H "X-Browser-Use-API-Key: ${API_KEY}" \
   -H 'Content-Type: application/json' \
-  -d '{"action":"stop"}'
+  -d '{"action":"stop"}')
+
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+BODY=$(echo "$RESPONSE" | head -n -1)
+
+if [[ "$HTTP_CODE" != "200" ]]; then
+  echo "Error: Browser Use API returned HTTP $HTTP_CODE: $BODY" >&2
+  exit 1
+fi
+
+echo "$BODY"

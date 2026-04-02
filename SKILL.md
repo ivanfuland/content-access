@@ -106,6 +106,7 @@ opencli twitter thread <tweet-id>   # 从 tweet URL 末段提取 id
 | 错误类型 | 判断依据 | 处理方式 |
 |---------|---------|---------|
 | 命令不存在 / 平台不支持 | `command not found`、`Unknown command` | 降级 summarize |
+| YouTube 字幕/音频不可用 | `transcriptSource=unavailable` | ⛔ 直接报错，不降级（内容源本身无字幕）|
 | 登录态失效 / Cookie 过期 | `Not logged in`、`login required`、`unauthorized`、`401` | ⚠️ 提示用户：`opencli <site> login` 重新登录，不自动降级 |
 | Rate limit / 请求过多 | `rate limit`、`429`、`too many requests` | 告知用户等待后重试，不降级 |
 | 网络超时 | `timeout`、`connection error` | 重试一次，仍失败则降级 summarize |

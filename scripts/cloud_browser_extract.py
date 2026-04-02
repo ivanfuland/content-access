@@ -18,31 +18,37 @@ from playwright.sync_api import sync_playwright
 
 def extract(cdp_url: str, target_url: str, wechat: bool = False) -> dict:
     pw = sync_playwright().start()
-    browser = pw.chromium.connect_over_cdp(cdp_url)
-    page = browser.contexts[0].new_page()
-    page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
-    page.wait_for_timeout(3000)
+    try:
+        browser = pw.chromium.connect_over_cdp(cdp_url)
+        contexts = browser.contexts
+        if not contexts:
+            raise RuntimeError("No browser contexts available")
+        page = contexts[0].new_page()
+        page.goto(target_url, wait_until='domcontentloaded', timeout=30000)
+        page.wait_for_timeout(3000)
 
-    if wechat:
-        title_el = page.query_selector('#activity-name') or page.query_selector('title')
-        author_el = page.query_selector('#js_name')
-        body_el = page.query_selector('#js_content') or page.query_selector('body')
-        result = {
-            'title': title_el.inner_text().strip() if title_el else '',
-            'author': author_el.inner_text().strip() if author_el else '',
-            'content': body_el.inner_text().strip() if body_el else '',
-            'url': target_url,
-        }
-    else:
-        result = {
-            'title': page.title(),
-            'content': page.query_selector('body').inner_text().strip(),
-            'url': target_url,
-        }
+        if wechat:
+            title_el = page.query_selector('#activity-name') or page.query_selector('title')
+            author_el = page.query_selector('#js_name')
+            body_el = page.query_selector('#js_content') or page.query_selector('body')
+            result = {
+                'title': title_el.inner_text().strip() if title_el else '',
+                'author': author_el.inner_text().strip() if author_el else '',
+                'content': body_el.inner_text().strip() if body_el else '',
+                'url': target_url,
+            }
+        else:
+            body_el = page.query_selector('body')
+            result = {
+                'title': page.title(),
+                'content': body_el.inner_text().strip() if body_el else '',
+                'url': target_url,
+            }
 
-    browser.close()
-    pw.stop()
-    return result
+        browser.close()
+        return result
+    finally:
+        pw.stop()
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
