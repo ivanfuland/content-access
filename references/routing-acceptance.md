@@ -55,6 +55,7 @@ provider_command: opencli twitter thread 1234567890
 期望路由: Tier 1 opencli twitter article 9876543210
 provider_command: opencli twitter article 9876543210
 合同依据: routing-rules.md → Twitter/X status URL 意图分流
+fallback_reason: 无（Tier 1 成功，不触发 Tier 3）
 解释: 用户意图为正文类，优先走 twitter article。若成功，输出 source_type=article；不进 thread。
 ```
 
@@ -63,10 +64,12 @@ provider_command: opencli twitter article 9876543210
 ```
 输入: https://x.com/someuser/status/1111111111
 用户意图: "帮我看这条推文"（无明确评论/线程意图）
+article 失败条件: twitter article 返回空内容（content 字段为空或纯空白）
 初次路由: opencli twitter article 1111111111 → 返回空内容（普通短推，非 Article）
 期望路由: 降级 opencli twitter thread 1111111111
 provider_command: opencli twitter thread 1111111111
 合同依据: routing-rules.md → Twitter/X status URL 意图分流 → article 失败判断标准
+fallback_reason: 无（Tier 1 内部降级，不触发 Tier 3）
 解释: article 返回空内容，判定为非 Article 内容，在 Tier 1 内部降级到 thread。不触发 Tier 2/3。
 ```
 
@@ -116,3 +119,4 @@ provider_command: opencli twitter thread 1111111111
 - `provider_command`：实际执行的命令
 - 如走 Tier 3：`fallback_reason` 必须填入 fallback-matrix.md 枚举值
 - 能回答「为什么没走其他路径」
+- 如走 Tier 1 内部降级（如 article → thread）：须说明降级触发条件及最终执行命令
