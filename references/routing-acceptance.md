@@ -36,13 +36,38 @@ fallback_reason: （Tier 2 成功时无；失败时 summarize_failed 或 content
 解释: 非 exceptions.md 白名单域名，capability-matrix 无 opencli 提取命令，走主合同 Tier 2。
 ```
 
-### 4. X 线程
+### 4. X 线程（评论/回复意图）
 
 ```
 输入: https://x.com/elonmusk/status/1234567890
+用户意图: "帮我看这条推文的评论区" / "把回复线程抓下来"
 期望路由: Tier 1 opencli twitter thread 1234567890
-合同依据: capability-matrix.md → Twitter URL 提取速查
-解释: URL 预处理提取 tweet-id，capability-matrix 有对应命令，直接 Tier 1。
+provider_command: opencli twitter thread 1234567890
+合同依据: routing-rules.md → Twitter/X status URL 意图分流
+解释: 用户意图含"评论/回复/线程"关键词，直接走 twitter thread，不尝试 article。
+```
+
+### 4a. X 链接正文提取（article 意图）
+
+```
+输入: https://x.com/someuser/status/9876543210
+用户意图: "帮我看这个 x 链接" / "提取正文" / "存一下这篇文章"
+期望路由: Tier 1 opencli twitter article 9876543210
+provider_command: opencli twitter article 9876543210
+合同依据: routing-rules.md → Twitter/X status URL 意图分流
+解释: 用户意图为正文类，优先走 twitter article。若成功，输出 source_type=article；不进 thread。
+```
+
+### 4b. X 普通短推 article 失败 → 降级 thread
+
+```
+输入: https://x.com/someuser/status/1111111111
+用户意图: "帮我看这条推文"（无明确评论/线程意图）
+初次路由: opencli twitter article 1111111111 → 返回空内容（普通短推，非 Article）
+期望路由: 降级 opencli twitter thread 1111111111
+provider_command: opencli twitter thread 1111111111
+合同依据: routing-rules.md → Twitter/X status URL 意图分流 → article 失败判断标准
+解释: article 返回空内容，判定为非 Article 内容，在 Tier 1 内部降级到 thread。不触发 Tier 2/3。
 ```
 
 ### 5. 本地 PDF
