@@ -15,7 +15,7 @@ content-access 路由细则。所有路由决策依此执行，禁止跳级。
 | `twitter.com/...` | `x.com/...` |
 | `mobile.twitter.com/...` | `x.com/...` |
 | `m.bilibili.com/...` | `bilibili.com/...` |
-| `x.com/<user>/status/<id>` | tweet-id = `<id>` |
+| `x.com/<user>/status/<id>` | tweet-id = `<id>`，内容类型由用户意图决定（见下方 Twitter 意图分流规则）|
 
 ---
 
@@ -74,6 +74,7 @@ opencli <site> <command> [--option value] [-f json]
   ├─ 平台 URL
   │    ├─ URL 预处理
   │    ├─ 查 capability-matrix.md 速查表
+  │    │    ├─ Twitter x.com/*/status/<id> → 见 Twitter/X status URL 意图分流章节
   │    │    ├─ 有 opencli 提取命令 → Tier 1
   │    │    │    └─ 失败 → 见 opencli 错误处理
   │    │    └─ 无 opencli 提取命令 → Tier 2
@@ -93,6 +94,29 @@ opencli <site> <command> [--option value] [-f json]
   └─ 写操作（发帖 / 回复 / 点赞 / 收藏 / 签到）
        └─ confirm required（见 write-safety.md） → Tier 1
 ```
+
+---
+
+## Twitter/X status URL 意图分流
+
+`x.com/<user>/status/<id>` 的 URL 外壳相同，但内部内容类型不同（短推 / 长文 Article / 视频推文 / 线程入口）。
+**不能仅凭 URL 形态决定路由**，必须结合用户意图：
+
+```
+x.com/<user>/status/<id>
+  ├─ 用户意图含"评论/回复/线程/讨论" → opencli twitter thread <tweet-id>
+  └─ 其他默认正文类意图（"帮我看/提取/全文/存 md/帮我看这个链接"）
+        └─ opencli twitter article <tweet-id>
+              └─ 失败（空内容 / 无 title 或 content / 明确非 article）
+                    → 降级 opencli twitter thread <tweet-id>
+```
+
+**article 失败判断标准**（以下任一满足即降级）：
+- 返回空内容或纯空白
+- 无法提取 title 和 content 中的任何一个
+- 命令输出明确包含"not an article"、"no article content"等提示
+
+**注意：** article 降级到 thread 属于 Tier 1 内部 fallback，不触发 Tier 2/3。
 
 ---
 
