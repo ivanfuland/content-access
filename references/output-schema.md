@@ -99,7 +99,7 @@ content:          article 正文 markdown
 published_at:     推文时间（如命令提供）
 ```
 
-**article 降级说明：** 若 `twitter article` 返回空内容或无 title/content，自动降级执行 `twitter thread <tweet-id>`，输出格式改为上方 `twitter thread` 的 schema。
+**article 降级说明：** 若 `twitter article` 返回空内容或无法提取 title 和 content 中的任何一个，自动降级执行 `twitter thread <tweet-id>`，输出格式改为上方 `twitter thread` 的 schema。
 
 ### Tier 2 — summarize（网页 / 文章 / PDF）
 

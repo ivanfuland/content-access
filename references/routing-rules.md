@@ -105,7 +105,7 @@ opencli <site> <command> [--option value] [-f json]
 ```
 x.com/<user>/status/<id>
   ├─ 用户意图含"评论/回复/线程/讨论" → opencli twitter thread <tweet-id>
-  └─ 其他默认正文类意图（"帮我看这个链接/提取/全文/存 md"）
+  └─ 其他默认正文类意图（"帮我看这个链接/提取/全文/存 md"，包括仅贴链接无附加说明的情况）
         └─ opencli twitter article <tweet-id>
               └─ 失败（空内容 / 无 title 或 content / 明确非 article）
                     → 降级 opencli twitter thread <tweet-id>
