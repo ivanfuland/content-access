@@ -84,6 +84,23 @@ content:          推文正文（含线程所有推文拼接）
 published_at:     推文时间（如命令提供）
 ```
 
+### Tier 1 — opencli twitter article
+
+```
+intent:           用户意图归纳
+route:            opencli
+provider_command: opencli twitter article <tweet-id>
+source_type:      article
+platform:         x.com
+title:            命令输出的 article 标题
+url:              https://x.com/<user>/status/<tweet-id>
+author:           @用户名
+content:          article 正文 markdown
+published_at:     推文时间（如命令提供）
+```
+
+**article 降级说明：** 若 `twitter article` 返回空内容或无 title/content，自动降级执行 `twitter thread <tweet-id>`，输出格式改为上方 `twitter thread` 的 schema。
+
 ### Tier 2 — summarize（网页 / 文章 / PDF）
 
 ```
