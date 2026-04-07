@@ -10,7 +10,8 @@
 |------|----------------|------|
 | YouTube | `youtube transcribe <url>` | plugin 命令；降级 `youtube transcript <video_id>` |
 | Bilibili | `bilibili transcribe <url\|bvid>` | plugin 命令；降级 `bilibili subtitle <bvid>` |
-| Twitter/X | `twitter thread <tweet-id>` | tweet-id 取 URL 末段数字 |
+| Twitter/X Article | `twitter article <tweet-id>` | 适用于 Twitter Article 长文正文提取；tweet-id 取 URL 末段数字 |
+| Twitter/X Thread | `twitter thread <tweet-id>` | 适用于原推 + 回复线程提取；tweet-id 取 URL 末段数字 |
 | V2EX | `v2ex topic --id <topic_id>` | topic_id 取 URL `/t/<id>` |
 | Reddit | — | URL 正文提取直接 cloud_browser（见 exceptions.md）|
 | 微信文章 | — | 直接 cloud_browser --wechat（见 exceptions.md）|
@@ -35,6 +36,7 @@
 | 通知 | `twitter notifications` | `--limit N` |
 | 用户推文 | `twitter profile` | `--username <handle>`, `--limit N` |
 | 粉丝/关注列表 | `twitter followers` / `twitter following` | `--user <handle>`, `--limit N` |
+| 长文 Article | `twitter article` | `<tweet-id>` |
 | 推文线程 | `twitter thread` | `<tweet-id>` |
 | 发推 ⚠️ | `twitter post` | `--text <str>` |
 | 回复 ⚠️ | `twitter reply` | `--url <tweet_url>`, `--text <str>` |
